@@ -23,58 +23,58 @@ ImgInfo::~ImgInfo(void)
 		GDALClose((GDALDatasetH)srcImgDataset_);
 	}
 }
-//根据瓦片左上角的经度和层数计算文件夹的名字
+//根据瓦片左下角的经度和层数计算文件夹的名字
 int ImgInfo::calcuTileDirName(double pixLongitude, int tileFloor)
 {
 	return static_cast<int>( static_cast<float>( (pixLongitude + 180.0) / 360.0 * pow(2.0, tileFloor) ) );
 }
-//根据瓦片左上角的纬度和层数计算文件的名字
+//根据瓦片左下角的纬度和层数计算文件的名字
 int ImgInfo::calcuTileFileName(double pixLatitude, int tileFloor)
 {
-	//return static_cast<int>( (1.0 - log( tan(pixLatitude * M_PI/180.0) + 1.0 / cos(pixLatitude * M_PI/180.0)) / M_PI) / 2.0 * pow(2.0, tileFloor) );
-
 	double tiley = static_cast<float>( (1 - log(tan(pixLatitude * M_PI / 180) + 1 / cos(pixLatitude * M_PI / 180)) / M_PI) / 2 * pow(2, tileFloor));
 	return static_cast<int>(pow(2, tileFloor) - tiley - 1);
-
 }
-//根据瓦片文件夹的名字和层数计算瓦片左上角的经度
+//根据瓦片文件夹的名字和层数计算瓦片左下角的经度
 double ImgInfo::calcuTilePixLongitude(int tileDirName, int tileFloor)
 {
 	return tileDirName / pow(2.0, tileFloor) * 360.0 - 180;
 }
-//根据瓦片文件的名字和层数计算瓦片左上角的纬度
+
+//根据瓦片文件的名字和层数计算瓦片左下角的纬度
 double ImgInfo::calcuTilePixLatitude(int tileFileName, int tileFloor)
 {
 	double n = M_PI - 2.0 * M_PI * tileFileName / pow(2.0, tileFloor);
 	return - (180.0 / M_PI * atan(0.5 * (exp(n) - exp(-n) ) ) );
 
 }
+
+//计算原始图像的经纬度范围，结果存到类相应的属性中
 void ImgInfo::calcuLongitudeLatitudeRange()
 {
-	this->imgMaxLatitude = -999999999;
-	this->imgMinLatitude = 999999999;
-	this->imgMaxLongitude = -999999999;
-	this->imgMinLongitude = 999999999;
-
 	double latitude, longitude;
-	this->ImageRowCol2Projection(0, 0, longitude, latitude);
-	this->imgMaxLongitude = max(imgMaxLongitude , longitude);
-	this->imgMinLongitude = min(imgMinLongitude , longitude);
-	this->imgMaxLatitude = max(imgMaxLatitude , latitude);
-	this->imgMinLatitude = min(imgMinLatitude , latitude);
 
+	//计算左上角经纬度
+	this->ImageRowCol2Projection(0, 0, longitude, latitude);	
+	this->imgMaxLatitude = latitude;
+	this->imgMinLatitude = latitude;
+	this->imgMaxLongitude = longitude;
+	this->imgMinLongitude = longitude;
+
+	//计算左下角的经纬度
 	this->ImageRowCol2Projection(0, this->getSrcImgHeigh(), longitude, latitude);
 	this->imgMaxLongitude = max(imgMaxLongitude , longitude);
 	this->imgMinLongitude = min(imgMinLongitude , longitude);
 	this->imgMaxLatitude = max(imgMaxLatitude , latitude);
 	this->imgMinLatitude = min(imgMinLatitude , latitude);
 
+	//计算右上角的经纬度
 	this->ImageRowCol2Projection(this->getSrcImgWidth(), 0, longitude, latitude);
 	this->imgMaxLongitude = max(imgMaxLongitude , longitude);
 	this->imgMinLongitude = min(imgMinLongitude , longitude);
 	this->imgMaxLatitude = max(imgMaxLatitude , latitude);
 	this->imgMinLatitude = min(imgMinLatitude , latitude);
 
+	//计算右下角的经纬度
 	this->ImageRowCol2Projection(this->getSrcImgWidth(), this->getSrcImgHeigh(), longitude, latitude);
 	this->imgMaxLongitude = max(imgMaxLongitude , longitude);
 	this->imgMinLongitude = min(imgMinLongitude , longitude);
@@ -82,6 +82,8 @@ void ImgInfo::calcuLongitudeLatitudeRange()
 	this->imgMinLatitude = min(imgMinLatitude , latitude );
 }
 
+//构造函数，打开原始图像，获得图像的波段数、宽、高、图像的经纬度范围
+//srcImgPath:原始图像的路径
 ImgInfo::ImgInfo(std::string srcImgPath):srcImgPath_(srcImgPath)
 {
 	this->openImg(srcImgPath);
@@ -92,6 +94,8 @@ ImgInfo::ImgInfo(std::string srcImgPath):srcImgPath_(srcImgPath)
 	this->calcuLongitudeLatitudeRange();
 }
 
+//以共享的方式打开原始图像
+//srcImgPath：原始图像的路径
 void ImgInfo::openImg(std::string srcImgPath)
 {
 	srcImgDataset_ = (GDALDataset *)GDALOpenShared(srcImgPath.c_str(), GA_ReadOnly);
@@ -102,48 +106,12 @@ void ImgInfo::openImg(std::string srcImgPath)
 	}
 }
 
-//bool ImgInfo::GDALInfoReportCorner(OGRCoordinateTransformationH hTransform,
-//                      double x, double y , std::string &longitude, std::string &latitude)
-//{
-//	double	dfGeoX, dfGeoY;
-//    double	adfGeoTransform[6];
-//
-//	if(srcImgDataset_->GetGeoTransform(adfGeoTransform) == CE_None)
-//	{
-//		dfGeoX = adfGeoTransform[0] + adfGeoTransform[1] * x
-//            + adfGeoTransform[2] * y;
-//        dfGeoY = adfGeoTransform[3] + adfGeoTransform[4] * x
-//            + adfGeoTransform[5] * y;
-//	}else{
-//		return false;
-//	}
-//
-//	if( hTransform != NULL 
-//        && OCTTransform(hTransform,1,&dfGeoX,&dfGeoY,NULL) )
-//    {
-//        
-//		longitude = GDALDecToDMS( dfGeoX, "Long", 2 );
-//		latitude = GDALDecToDMS( dfGeoY, "Lat", 2 );
-//    }
-//	
-//	return true;
-//}
-
-////将度分秒格式的经纬度转成double类型
-//double ImgInfo::convertLongLat2double(const std::string& longORlat)
-//{
-//	int degree;
-//	int minute;
-//	float second;
-//	sscanf(longORlat.c_str(), "%dd%d\'%f\"%*c", &degree, &minute, &second);
-//	if(longORlat[longORlat.length() - 1] == 'S')
-//	{
-//		return -(degree + minute / 60.0 + second / 3600.0);
-//	}
-//	return degree + minute / 60.0 + second / 3600.0;
-//}
-
-//根据经纬度找图像上对应的点
+//根据经纬度找图像上对应的点，若该经纬度超出图像的范围
+//找图像内最靠近该经纬度的点
+//longitude：经度
+//latitude：纬度
+//coord：存储计算结果
+//转换成功返回true，失败返回false
 bool ImgInfo::Projection2ImageRowCol(double longitude, double latitude, Pixcoord &coord)  
 {  
 	longitude = max(longitude, this->getImgMinLongitude());
@@ -172,7 +140,12 @@ bool ImgInfo::Projection2ImageRowCol(double longitude, double latitude, Pixcoord
     }  
 }
 
-//计算图像上点的经纬度
+//计算图像上点的经纬度（width、height是相对于左上角的偏移量）
+//width：待计算点的宽坐标
+//height：待计算点的高坐标
+//longitude：该点的经度
+//latitude：该点的纬度
+//计算成功返回true，否则false
 bool ImgInfo::ImageRowCol2Projection(int width, int height, double &longitude, double &latitude)  
 {  
     //adfGeoTransform[6]  数组adfGeoTransform保存的是仿射变换中的一些参数，分别含义见下  
@@ -195,50 +168,6 @@ bool ImgInfo::ImageRowCol2Projection(int width, int height, double &longitude, d
         return false;  
     }  
 }  
-
-//获取任意一个点的经纬度
-//widthPoint：像素的宽坐标
-//heightPoint：像素的纵坐标
-//longttude：计算出的经度，格式：291d 4'34.58''E
-//latitude：计算出的纬度格式：22d17'28.73''S
-//void ImgInfo::transCoord2longitudeLatitude(double widthPoint, double heightPoint,std::string &longitude, std::string &latitude)
-//{
-//	const char  *pszProjection = NULL;
-//	double		adfGeoTransform[6];
-//	OGRCoordinateTransformationH hTransform = NULL;
-//	srcImgDataset_->GetGeoTransform(adfGeoTransform);
-//
-//	if(srcImgDataset_->GetGeoTransform(adfGeoTransform) == CE_None)
-//	{
-//		pszProjection = srcImgDataset_->GetProjectionRef();
-//	}
-//	if(pszProjection != NULL && strlen(pszProjection) > 0 )
-//	{
-//		OGRSpatialReferenceH hProj, hLatLong = NULL;
-//
-//        hProj = OSRNewSpatialReference( pszProjection );
-//        if( hProj != NULL )
-//            hLatLong = OSRCloneGeogCS( hProj );
-//
-//        if( hLatLong != NULL )
-//        {
-//            CPLPushErrorHandler( CPLQuietErrorHandler );
-//            hTransform = OCTNewCoordinateTransformation( hProj, hLatLong );
-//            CPLPopErrorHandler();
-//            
-//            OSRDestroySpatialReference( hLatLong );
-//        }
-//
-//        if( hProj != NULL )
-//            OSRDestroySpatialReference( hProj );
-//	}
-//	GDALInfoReportCorner(hTransform,  widthPoint, heightPoint ,longitude, latitude);
-//	if( hTransform != NULL )
-//    {
-//        OCTDestroyCoordinateTransformation( hTransform );
-//        hTransform = NULL;
-//    }
-//}
 
 int ImgInfo::getSrcImgHeigh()
 {
@@ -269,6 +198,7 @@ double ImgInfo::getImgMinLongitude()
 	return this->imgMinLongitude;
 }
 
+//参考GDAL的源代码，具体在哪个文件，忘了
 void ImgInfo::Usage(const char* pszErrorMsg = NULL, int bShort = TRUE)
 {
     int	iDr;
@@ -301,7 +231,7 @@ void ImgInfo::Usage(const char* pszErrorMsg = NULL, int bShort = TRUE)
 /************************************************************************/
 /*                              SrcToDst()                              */
 /************************************************************************/
-
+//参考GDAL的源代码，具体在哪个文件，忘了
 void ImgInfo::SrcToDst( double dfX, double dfY,
                       int nSrcXOff, int nSrcYOff,
                       int nSrcXSize, int nSrcYSize,
@@ -317,7 +247,7 @@ void ImgInfo::SrcToDst( double dfX, double dfY,
 /************************************************************************/
 /*                          GetSrcDstWindow()                           */
 /************************************************************************/
-
+//参考GDAL的源代码，具体在哪个文件，忘了
 int ImgInfo::FixSrcDstWindow( int* panSrcWin, int* panDstWin,
                             int nSrcRasterXSize,
                             int nSrcRasterYSize )
@@ -454,7 +384,7 @@ int ImgInfo::FixSrcDstWindow( int* panSrcWin, int* panDstWin,
     }
 }
 
-
+//参考GDAL的源代码，具体在哪个文件，忘了
 int ImgInfo::ProxyMain( int argc, char ** argv )
 
 {
@@ -1844,7 +1774,7 @@ int ImgInfo::ProxyMain( int argc, char ** argv )
 /************************************************************************/
 /*                            ArgIsNumeric()                            */
 /************************************************************************/
-
+//参考GDAL的源代码，具体在哪个文件，忘了
 int ImgInfo::ArgIsNumeric( const char *pszArg )
 
 {
@@ -1854,7 +1784,7 @@ int ImgInfo::ArgIsNumeric( const char *pszArg )
 /************************************************************************/
 /*                           AttachMetadata()                           */
 /************************************************************************/
-
+//参考GDAL的源代码，具体在哪个文件，忘了
 void ImgInfo::AttachMetadata( GDALDatasetH hDS, char **papszMetadataOptions )
 
 {
@@ -1880,7 +1810,7 @@ void ImgInfo::AttachMetadata( GDALDatasetH hDS, char **papszMetadataOptions )
 
 /* A bit of a clone of VRTRasterBand::CopyCommonInfoFrom(), but we need */
 /* more and more custom behaviour in the context of gdal_translate ... */
-
+//参考GDAL的源代码，具体在哪个文件，忘了
 void ImgInfo::CopyBandInfo( GDALRasterBand * poSrcBand, GDALRasterBand * poDstBand,
                           int bCanCopyStatsMetadata, int bCopyScale, int bCopyNoData )
 
@@ -1927,13 +1857,13 @@ void ImgInfo::CopyBandInfo( GDALRasterBand * poSrcBand, GDALRasterBand * poDstBa
     if( !EQUAL(poSrcBand->GetUnitType(),"") )
         poDstBand->SetUnitType( poSrcBand->GetUnitType() );
 }
-//切图，读取原始图像，切指定区域的矩形，生成目标图
-//inImgPath：此参数已作废
+
+//切指定区域的矩形，生成目标图
 //outImgPath：目标图像的路径（可以是jpg图）
-//widthPoint：切分区域左上角的横坐标（以像素为单位）
+//widthPoint：切分区域左上角的宽坐标（以像素为单位）
 //heightPoint：切分区域左上角的纵坐标（以像素为单位）
-//widthPixelLen：切分区域横坐标上的长度（以像素为单位）
-//heightPixelLen：切分区域纵坐标上的长度（以像素为单位）
+//widthPixelLen：切分区域横坐标方向上的长度（以像素为单位）
+//heightPixelLen：切分区域纵坐标方向上的长度（以像素为单位）
 int ImgInfo::translate(std::string outImgPath, std::string widthPoint, std::string heightPoint, std::string widthPixelLen, std::string heightPixelLen)
 {
 	//gdal_translate -ot byte -of GTiff -co "TILED=YES" D:\\GDALTEST\\test.tif D:\\GDALTEST\\1.jpg -srcwin 0 0 19941 10610
@@ -1942,17 +1872,16 @@ int ImgInfo::translate(std::string outImgPath, std::string widthPoint, std::stri
 		"-srcwin", (char*)widthPoint.c_str(), (char*)heightPoint.c_str(),
 		(char*)widthPixelLen.c_str(), (char*)heightPixelLen.c_str(), "-outsize", "256", "256"};
 
-	//15为argv中字符串的个数
+	//17为argv中字符串的个数
 	return ProxyMain(17, argv);
 }
 
-//切图，读取原始图像，切指定区域的矩形，生成目标图
-//inImgPath：此参数已作废
+//切指定区域的矩形，生成目标图
 //outImgPath：目标图像的路径（可以是jpg图）
-//widthPoint：切分区域左上角的横坐标（以像素为单位）
+//widthPoint：切分区域左上角的宽坐标（以像素为单位）
 //heightPoint：切分区域左上角的纵坐标（以像素为单位）
-//widthPixelLen：切分区域横坐标上的长度（以像素为单位）
-//heightPixelLen：切分区域纵坐标上的长度（以像素为单位）
+//widthPixelLen：切分区域横坐标方向上的长度（以像素为单位）
+//heightPixelLen：切分区域纵坐标方向上的长度（以像素为单位）
 int ImgInfo::translate(std::string outImgPath, int widthPoint, int heightPoint, int widthPixelLen, int heightPixelLen)
 {
 	std::ostringstream str_widthPoint; 

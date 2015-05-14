@@ -7,11 +7,27 @@ class TileInfo
 public:
 	TileInfo(void);
 	virtual ~TileInfo(void);
-	//
-	TileInfo(ImgInfo *img, int tileFloor, int widthPixLen, int heightPixLen);
+	//构造函数
+	//img：原始图像的指针
+	//tileFloor：瓦片层数
+	TileInfo(ImgInfo *img, int tileFloor);
+	//返回瓦片路径
 	std::string getTilePath();
+	//获取该文件在原始图像上对应的区域，计算后：
+	//this->widthPixPoint_保存该区域左上角的宽坐标
+	//this->heightPixPoint_保存该区域左上角的宽坐标
+	//this->cutHeightPixLen_保存该区域的高度
+	//this->cutWidthPixLen_保存该区域的宽度
+	//dirName:文件夹名字
+	//fileName：文件名字
+	//返回该瓦片所对应的原始图像区域左上角坐标（以像素为单位）
 	Pixcoord findPixcoord(int dirName, int fileName);
+	//根据根路径、瓦片层数、文件夹、文件，生成瓦片路径
+	//rootPath：根路径
+	//dir：文件夹名字
+	//file:文件名字
 	bool createTileFilePath(std::string rootPath, int dir, int file);
+
 	int getWidthPixPoint()
 	{
 		return this->widthPixPoint_;
@@ -29,21 +45,25 @@ public:
 		return this->cutHeightPixLen_;
 	}
 private:
-	//计算瓦片左上角在原始图像中的坐标（以像素为单位）
+	//根据文件夹、文件的名字计算瓦片左下角点的坐标（相对于左上角，以像素为单位）
+	//若计算出的坐标不在原始图像范围内，返回原始图像内距该坐标最近的坐标
+	//dirName：文件夹名字
+	//fileName：文件名字
+	//返回值coord：该瓦片左下角的坐标
 	Pixcoord calcuTileCoord(int dirName, int fileName);
-	//以二分查找的方式在low和height中找出一个值，该值大于等于small，小于等于big
-	//返回-1代表失败
-	int binarySearchPixHeightCoord(int low, int height, int small, int big);
-	int binarySearchPixWidthCoord(int low, int height, int small, int big);
+	//原始图像
 	ImgInfo *img_;
 	//瓦片路径
 	std::string filePath_;
+	//瓦片层数
 	int tileFloor_;
-	//瓦片左下角在原图上的点坐标
+	//瓦片左下角在原图上的宽坐标
 	int widthPixPoint_;
+	//瓦片左下角在原图上的高坐标
 	int heightPixPoint_;
-	//瓦片在原图中的大小
+	//瓦片在原图中宽坐标方向上的大小（以像素为单位）
 	int cutWidthPixLen_;
+	//瓦片在原图中高坐标方向上的大小（以像素为单位）
 	int cutHeightPixLen_;
 };
 

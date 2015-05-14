@@ -1,2 +1,0 @@
-//#include <string>
-//int translate(GDALDataset* srcImgDataset, std::string inImgPath, std::string outImgPath, std::string widthPoint, std::string heightPoint, std::string widthPixelLen, std::string heightPixelLen);

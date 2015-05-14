@@ -15,16 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="commonutils.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="cutImgTest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DebugPrint.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="gdal_translate.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ImgInfo.cpp">
@@ -36,15 +30,12 @@
     <ClCompile Include="TileInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="commonutils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="commonutils.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DebugPrint.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="gdal_translate.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ImgInfo.h">
@@ -54,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TileInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="commonutils.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

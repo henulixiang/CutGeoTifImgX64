@@ -9,7 +9,6 @@
 #include <cmath>
 #include <string>
 #include "Pixcoord.h"
-#include "gdal_translate.h"
 using namespace std;
 
 int main(int argc, char* argv[])
@@ -37,18 +36,18 @@ int main(int argc, char* argv[])
 			swap(fileMin, fileMax);
 		}
 
-		int stepWidthLen = (img.getSrcImgWidth() % static_cast<int>( pow(2, tileFloor)) == 0) ?
+		/*int stepWidthLen = (img.getSrcImgWidth() % static_cast<int>( pow(2, tileFloor)) == 0) ?
 			(img.getSrcImgWidth() / static_cast<int>( pow(2, tileFloor))) :
 			(img.getSrcImgWidth() / static_cast<int>( pow(2, tileFloor)) + 1);
 		int stepHeightLen = (img.getSrcImgHeigh() % static_cast<int>( pow(2, tileFloor)) == 0) ? 
 			(img.getSrcImgHeigh() / static_cast<int>( pow(2, tileFloor))) : 
-			(img.getSrcImgHeigh() / static_cast<int>( pow(2, tileFloor)) + 1);
+			(img.getSrcImgHeigh() / static_cast<int>( pow(2, tileFloor)) + 1);*/
 		
 		for(int dirName = dirMin; dirName <= dirMax; ++ dirName )
 		{
 			for(int fileName = fileMin; fileName <= fileMax; ++ fileName)
 			{
-				TileInfo tile(&img, tileFloor, stepWidthLen, stepHeightLen);
+				TileInfo tile(&img, tileFloor);
 				Pixcoord pix = tile.findPixcoord(dirName, fileName);
 				
 				if(tile.getCutWidthPixLen() <= 0 || tile.getCutHeightPixLen() <= 0 || tile.getHeightPixPoint() <= 0)

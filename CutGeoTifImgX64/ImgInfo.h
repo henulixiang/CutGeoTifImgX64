@@ -17,53 +17,63 @@ class ImgInfo
 {
 public:
 	ImgInfo(void);
+	//构造函数，打开原始图像，获得图像的波段数、宽、高、图像的经纬度范围
+	//srcImgPath:原始图像的路径
 	ImgInfo(std::string srcImgPath);
-	//以只读方式打开原始图像，成功：true，失败：false
+	//以共享的方式打开原始图像
+	//srcImgPath：原始图像的路径
 	void openImg(std::string srcImgPath);
-//	bool getPixelLongLat(int widthPoint, int heightPoint);
 	virtual ~ImgInfo(void);
 	int getSrcImgHeigh();
 	int getSrcImgWidth();
 	GDALDataset*& getDataset();
-//	double convertLongLat2double(const std::string& longORlat);
-	//获取任意一个点的经纬度
-	//hDataset：图像的GDALDatasetH对象
-	//widthPoint：像素的宽坐标
-	//heightPoint：像素的纵坐标
-	//longttude：计算出的经度，格式：291d 4'34.58''E
-	//latitude：计算出的纬度格式：22d17'28.73''S
-//	void transCoord2longitudeLatitude(double widthPoint, double heightPoint,std::string &longitude, std::string &latitude);
 
-	//切图，读取原始图像，切指定区域的矩形，生成目标图
+	//切指定区域的矩形，生成目标图
 	//outImgPath：目标图像的路径（可以是jpg图）
-	//widthPoint：切分区域左上角的横坐标（以像素为单位）
+	//widthPoint：切分区域左上角的宽坐标（以像素为单位）
 	//heightPoint：切分区域左上角的纵坐标（以像素为单位）
-	//widthPixelLen：切分区域横坐标上的长度（以像素为单位）
-	//heightPixelLen：切分区域纵坐标上的长度（以像素为单位）
+	//widthPixelLen：切分区域横坐标方向上的长度（以像素为单位）
+	//heightPixelLen：切分区域纵坐标方向上的长度（以像素为单位）
 	int translate(std::string outImgPath, std::string widthPoint, std::string heightPoint, std::string widthPixelLen, std::string heightPixelLen);
+
+	//切指定区域的矩形，生成目标图
+	//outImgPath：目标图像的路径（可以是jpg图）
+	//widthPoint：切分区域左上角的宽坐标（以像素为单位）
+	//heightPoint：切分区域左上角的纵坐标（以像素为单位）
+	//widthPixelLen：切分区域横坐标方向上的长度（以像素为单位）
+	//heightPixelLen：切分区域纵坐标方向上的长度（以像素为单位）
+	int translate(std::string outImgPath, int widthPoint, int heightPoint, int widthPixelLen, int heightPixelLen);
 	double getImgMaxLongitude();
 	double getImgMinLongitude();
 	double getImgMaxLatitude();
 	double getImgMinLatitude();
-	//根据瓦片左上角的经度和层数计算文件夹的名字
+	//根据瓦片左下角的经度和层数计算文件夹的名字
 	int calcuTileDirName(double pixLongitude, int tileFloor);
-	//根据瓦片左上角的纬度和层数计算文件的名字
+	//根据瓦片左下角的纬度和层数计算文件的名字
 	int calcuTileFileName(double pixLatitude, int tileFloor);
-	//根据瓦片文件夹的名字和层数计算瓦片左上角的经度
+	//根据瓦片文件夹的名字和层数计算瓦片左下角的经度
 	double calcuTilePixLongitude(int tileDirName, int tileFloor);
-	//根据瓦片文件的名字和层数计算瓦片左上角的纬度
-	double calcuTilePixLatitude(int tileFileName, int tileFloor);
+	//根据瓦片文件的名字和层数计算瓦片左下角的纬度
+	double calcuTilePixLatitude(int tileFileName, int tileFloor);	
 
-	
-
-	//根据经纬度找图像上对应的点
+	//根据经纬度找图像上对应的点，若该经纬度超出图像的范围
+	//找图像内最靠近该经纬度的点
+	//longitude：经度
+	//latitude：纬度
+	//coord：存储计算结果
+	//转换成功返回true，失败返回false
 	bool Projection2ImageRowCol(double longitude, double latitude, Pixcoord &coord)  ;
-	//计算图像上点的经纬度
-	bool ImageRowCol2Projection(int width, int height, double &longitude, double &latitude) ;
 
-	int translate(std::string outImgPath, int widthPoint, int heightPoint, int widthPixelLen, int heightPixelLen);
+	//计算图像上点的经纬度（width、height是相对于左上角的偏移量）
+	//width：待计算点的宽坐标
+	//height：待计算点的高坐标
+	//longitude：该点的经度
+	//latitude：该点的纬度
+	//计算成功返回true，否则false
+	bool ImageRowCol2Projection(int width, int height, double &longitude, double &latitude) ;
+	
 private:
-	//计算原始图像的经纬度范围，结果保存到类属性里
+	//计算原始图像的经纬度范围，结果存到类相应的属性中
 	void calcuLongitudeLatitudeRange();
 
 	void CopyBandInfo( GDALRasterBand * poSrcBand, GDALRasterBand * poDstBand,
@@ -88,8 +98,6 @@ private:
 
 	void Usage(const char* pszErrorMsg, int bShort);
 
-	//bool GDALInfoReportCorner(OGRCoordinateTransformationH hTransform,
- //                     double x, double y , std::string &longitude, std::string &latitude);
 	//原始图像的Dataset
 	GDALDataset *srcImgDataset_;
 	//原始图像的宽
