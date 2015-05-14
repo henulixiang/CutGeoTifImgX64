@@ -157,7 +157,6 @@
     <ClCompile Include="gdal_translate.cpp" />
     <ClCompile Include="ImgInfo.cpp" />
     <ClCompile Include="Pixcoord.cpp" />
-    <ClCompile Include="ThreadPoolManage.cpp" />
     <ClCompile Include="TileInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -166,8 +165,6 @@
     <ClInclude Include="gdal_translate.h" />
     <ClInclude Include="ImgInfo.h" />
     <ClInclude Include="Pixcoord.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="ThreadPoolManage.h" />
     <ClInclude Include="TileInfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
