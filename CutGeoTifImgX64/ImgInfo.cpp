@@ -32,7 +32,7 @@ int ImgInfo::calcuTileDirName(double pixLongitude, int tileFloor)
 int ImgInfo::calcuTileFileName(double pixLatitude, int tileFloor)
 {
 	double tiley = static_cast<float>( (1 - log(tan(pixLatitude * M_PI / 180) + 1 / cos(pixLatitude * M_PI / 180)) / M_PI) / 2 * pow(2, tileFloor));
-	return static_cast<int>(pow(2, tileFloor) - tiley - 1);
+	return static_cast<int>(pow(2, tileFloor) - tiley );
 }
 //根据瓦片文件夹的名字和层数计算瓦片左下角的经度
 double ImgInfo::calcuTilePixLongitude(int tileDirName, int tileFloor)

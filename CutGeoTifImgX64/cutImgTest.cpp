@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 		int stepHeightLen = (img.getSrcImgHeigh() % static_cast<int>( pow(2, tileFloor)) == 0) ? 
 			(img.getSrcImgHeigh() / static_cast<int>( pow(2, tileFloor))) : 
 			(img.getSrcImgHeigh() / static_cast<int>( pow(2, tileFloor)) + 1);*/
-		
+
 		for(int dirName = dirMin; dirName <= dirMax; ++ dirName )
 		{
 			for(int fileName = fileMin; fileName <= fileMax; ++ fileName)
