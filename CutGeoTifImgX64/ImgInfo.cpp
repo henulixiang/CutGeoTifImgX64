@@ -114,10 +114,10 @@ void ImgInfo::openImg(std::string srcImgPath)
 //转换成功返回true，失败返回false
 bool ImgInfo::Projection2ImageRowCol(double longitude, double latitude, Pixcoord &coord)  
 {  
-	longitude = max(longitude, this->getImgMinLongitude());
+	/*longitude = max(longitude, this->getImgMinLongitude());
 	longitude = min(longitude, this->getImgMaxLongitude());
 	latitude = max(latitude, this->getImgMinLatitude());
-	latitude = min(latitude, this->getImgMaxLatitude());
+	latitude = min(latitude, this->getImgMaxLatitude());*/
 
 	double		adfGeoTransform[6];
 	srcImgDataset_->GetGeoTransform(adfGeoTransform);

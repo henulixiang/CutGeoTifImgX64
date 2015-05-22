@@ -13,15 +13,15 @@ public:
 	TileInfo(ImgInfo *img, int tileFloor);
 	//返回瓦片路径
 	std::string getTilePath();
-	//获取该文件在原始图像上对应的区域，计算后：
-	//this->widthPixPoint_保存该区域左上角的宽坐标
-	//this->heightPixPoint_保存该区域左上角的宽坐标
-	//this->cutHeightPixLen_保存该区域的高度
-	//this->cutWidthPixLen_保存该区域的宽度
-	//dirName:文件夹名字
-	//fileName：文件名字
-	//返回该瓦片所对应的原始图像区域左上角坐标（以像素为单位）
-	Pixcoord findPixcoord(int dirName, int fileName);
+//获取该文件在原始图像上对应的区域，计算后：
+//this->widthPixPoint_保存该区域左上角的宽坐标
+//this->heightPixPoint_保存该区域左上角的宽坐标
+//this->cutHeightPixLen_保存该区域的高度
+//this->cutWidthPixLen_保存该区域的宽度
+//dirName:文件夹名字
+//fileName：文件名字
+//算出坐标返回true，没算出返回false，pix存储最后计算出的结果
+bool TileInfo::findPixcoord(int dirName, int fileName, Pixcoord &pix);
 	//根据根路径、瓦片层数、文件夹、文件，生成瓦片路径
 	//rootPath：根路径
 	//dir：文件夹名字

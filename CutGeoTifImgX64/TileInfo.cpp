@@ -49,10 +49,10 @@ Pixcoord TileInfo::calcuTileCoord(int dirName, int fileName)
 
 	img_->Projection2ImageRowCol(pointLongitude, pointLatitude, coord);
 
-	coord.setWidth(MIN(coord.getWidth(), img_->getSrcImgWidth() ) );
+	/*coord.setWidth(MIN(coord.getWidth(), img_->getSrcImgWidth() ) );
 	coord.setWidth(MAX(coord.getWidth(), 0) );
 	coord.setHeight(MIN(coord.getHeight(), img_->getSrcImgHeigh() ) );
-	coord.setHeight(MAX(coord.getHeight(), 0) );
+	coord.setHeight(MAX(coord.getHeight(), 0) );*/
 	return coord;
 }
 //获取该文件在原始图像上对应的区域，计算后：
@@ -62,21 +62,38 @@ Pixcoord TileInfo::calcuTileCoord(int dirName, int fileName)
 //this->cutWidthPixLen_保存该区域的宽度
 //dirName:文件夹名字
 //fileName：文件名字
-//返回该瓦片所对应的原始图像区域左上角坐标（以像素为单位）
-Pixcoord TileInfo::findPixcoord(int dirName, int fileName)
+//算出坐标返回true，没算出返回false，pix存储最后计算出的结果
+bool TileInfo::findPixcoord(int dirName, int fileName, Pixcoord &pix)
 {
 	Pixcoord tileCoord[2];
 	Pixcoord rtn;
 	tileCoord[0] = this->calcuTileCoord(dirName, fileName);
 	tileCoord[1] = this->calcuTileCoord(dirName + 1, fileName + 1);
-	
+
+	if(tileCoord[0].getHeight() >= img_->getSrcImgHeigh() && tileCoord[1].getHeight() >= img_->getSrcImgHeigh()
+		|| tileCoord[0].getHeight() <= 0 && tileCoord[1].getHeight() <= 0
+		||tileCoord[0].getWidth() >= img_->getSrcImgWidth() && tileCoord[1].getWidth() >= img_->getSrcImgWidth()
+		||tileCoord[0].getWidth() <= 0 && tileCoord[1].getWidth() <= 0)
+	{
+		return false;
+	}
+	//若原始图像在缩略图中的大小小于缩略图大小的1/3，则不生成该图
+	if(img_->getSrcImgHeigh() < abs(tileCoord[0].getHeight() - tileCoord[1].getHeight() ) / 3 
+		|| img_->getSrcImgWidth() < abs(tileCoord[0].getWidth() - tileCoord[1].getWidth() ) / 3 )
+	{
+		return false;
+	}
+
 	this->cutHeightPixLen_ = abs(tileCoord[0].getHeight() - tileCoord[1].getHeight() );
 	this->cutWidthPixLen_ = abs(tileCoord[0].getWidth() - tileCoord[1].getWidth() );
 
 	this->widthPixPoint_ = MIN(tileCoord[0].getWidth(), tileCoord[1].getWidth() );
 	this->heightPixPoint_ = MAX(tileCoord[0].getHeight(), tileCoord[1].getHeight() );
 	
-	return Pixcoord(this->widthPixPoint_, this->heightPixPoint_);
+	pix.setWidth(this->widthPixPoint_);
+	pix.setHeight(this->heightPixPoint_);
+	return true;
+	//return Pixcoord(this->widthPixPoint_, this->heightPixPoint_);
 }
 //返回瓦片路径
 std::string TileInfo::getTilePath()
