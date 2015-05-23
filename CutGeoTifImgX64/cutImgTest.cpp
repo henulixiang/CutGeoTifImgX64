@@ -38,18 +38,18 @@ int main(int argc, char* argv[])
 		int tileFloor = floor;
 		string rootPath("D:\\GDALTEST");
 
-		int dirMin = img.calcuTileDirName(img.getImgMinLongitude(), tileFloor);
-		int dirMax = img.calcuTileDirName(img.getImgMaxLongitude(), tileFloor);
-		int fileMin = img.calcuTileFileName(img.getImgMinLatitude(), tileFloor);
-		int fileMax = img.calcuTileFileName(img.getImgMaxLatitude(), tileFloor);
+		int dirNameMin = img.calcuTileDirName(img.getImgMinLongitude(), tileFloor);
+		int dirNameMax = img.calcuTileDirName(img.getImgMaxLongitude(), tileFloor);
+		int fileNameMin = img.calcuTileFileName(img.getImgMinLatitude(), tileFloor);
+		int fileNameMax = img.calcuTileFileName(img.getImgMaxLatitude(), tileFloor);
 
-		if(dirMin > dirMax)
+		if(dirNameMin > dirNameMax)
 		{
-			swap(dirMin, dirMax);
+			swap(dirNameMin, dirNameMax);
 		}
-		if(fileMin > fileMax)
+		if(fileNameMin > fileNameMax)
 		{
-			swap(fileMin, fileMax);
+			swap(fileNameMin, fileNameMax);
 		}
 
 		/*int stepWidthLen = (img.getSrcImgWidth() % static_cast<int>( pow(2, tileFloor)) == 0) ?
@@ -59,9 +59,9 @@ int main(int argc, char* argv[])
 			(img.getSrcImgHeigh() / static_cast<int>( pow(2, tileFloor))) : 
 			(img.getSrcImgHeigh() / static_cast<int>( pow(2, tileFloor)) + 1);*/
 
-		for(int dirName = dirMin; dirName <= dirMax; ++ dirName )
+		for(int dirName = dirNameMin; dirName <= dirNameMax; ++ dirName )
 		{
-			for(int fileName = fileMin; fileName <= fileMax; ++ fileName)
+			for(int fileName = fileNameMin; fileName <= fileNameMax; ++ fileName)
 			{
 				TileInfo tile(&img, tileFloor);
 				Pixcoord pix;
