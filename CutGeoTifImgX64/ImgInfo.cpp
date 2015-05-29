@@ -384,7 +384,7 @@ int ImgInfo::FixSrcDstWindow( int* panSrcWin, int* panDstWin,
     }
 }
 
-//参考GDAL的源代码，具体在哪个文件，忘了
+//参考GDAL的源代码，具体在哪个文件，忘了（修改了原始代码，切记不要简单的替换！）
 int ImgInfo::ProxyMain( int argc, char ** argv )
 
 {

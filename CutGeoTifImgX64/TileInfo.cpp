@@ -49,10 +49,6 @@ Pixcoord TileInfo::calcuTileCoord(int dirName, int fileName)
 
 	img_->Projection2ImageRowCol(pointLongitude, pointLatitude, coord);
 
-	/*coord.setWidth(MIN(coord.getWidth(), img_->getSrcImgWidth() ) );
-	coord.setWidth(MAX(coord.getWidth(), 0) );
-	coord.setHeight(MIN(coord.getHeight(), img_->getSrcImgHeigh() ) );
-	coord.setHeight(MAX(coord.getHeight(), 0) );*/
 	return coord;
 }
 //获取该文件在原始图像上对应的区域，计算后：

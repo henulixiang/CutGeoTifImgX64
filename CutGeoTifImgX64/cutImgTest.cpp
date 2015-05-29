@@ -52,13 +52,6 @@ int main(int argc, char* argv[])
 			swap(fileNameMin, fileNameMax);
 		}
 
-		/*int stepWidthLen = (img.getSrcImgWidth() % static_cast<int>( pow(2, tileFloor)) == 0) ?
-			(img.getSrcImgWidth() / static_cast<int>( pow(2, tileFloor))) :
-			(img.getSrcImgWidth() / static_cast<int>( pow(2, tileFloor)) + 1);
-		int stepHeightLen = (img.getSrcImgHeigh() % static_cast<int>( pow(2, tileFloor)) == 0) ? 
-			(img.getSrcImgHeigh() / static_cast<int>( pow(2, tileFloor))) : 
-			(img.getSrcImgHeigh() / static_cast<int>( pow(2, tileFloor)) + 1);*/
-
 		for(int dirName = dirNameMin; dirName <= dirNameMax; ++ dirName )
 		{
 			for(int fileName = fileNameMin; fileName <= fileNameMax; ++ fileName)
